@@ -1,13 +1,17 @@
-using Data;
+using Application.Ports.Input;
+using Application.Ports.Output;
+using Application.UseCases;
+using Domain.Repositories;
+using Infrastructure.Persistence;
+using Infrastructure.Repositories;
+using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Services.Extensions;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// JWT
 var chaveJwt = builder.Configuration["Jwt:Key"];
 var emissor = builder.Configuration["Jwt:Issuer"];
 
@@ -37,8 +41,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddServices();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+builder.Services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
+builder.Services.AddScoped<IUsuarioUseCase, UsuarioUseCase>();
+builder.Services.AddScoped<IAuthUseCase, AuthUseCase>();
 
 var app = builder.Build();
 
