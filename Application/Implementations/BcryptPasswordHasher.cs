@@ -1,8 +1,9 @@
+using Application.Interfaces;
 using BCrypt.Net;
 
 namespace Application.Implementations
 {
-    public class BcryptPasswordHasher : Ports.Output.IPasswordHasher
+    public class BcryptPasswordHasher : IPasswordHasher
     {
         public string HashPassword(string password)
         {

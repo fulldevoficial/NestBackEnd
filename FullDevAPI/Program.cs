@@ -1,5 +1,4 @@
-using Application.Ports.Input;
-using Application.Ports.Output;
+using Application.Interfaces;
 using Application.UseCases;
 using Application.Implementations;
 using Data;
@@ -10,9 +9,6 @@ using Domain.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Services.Extensions;
-using Services.Interfaces.Login;
-using Services.Interfaces.Usuario;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,7 +49,6 @@ builder.Services.AddSingleton<IIdentityGenerator, UuidV7Generator>();
 // Registra repositories
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
-builder.Services.AddServices();
 builder.Services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddScoped<IUsuarioUseCase, UsuarioUseCase>();

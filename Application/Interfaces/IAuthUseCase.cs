@@ -1,6 +1,6 @@
 using Application.DTOs;
 
-namespace Application.Ports.Input
+namespace Application.Interfaces
 {
     public interface IAuthUseCase
     {

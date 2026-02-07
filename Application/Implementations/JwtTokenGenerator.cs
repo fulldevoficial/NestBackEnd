@@ -1,13 +1,13 @@
+using Application.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Models.Usuario;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
 namespace Application.Implementations
 {
-    public class JwtTokenGenerator : Ports.Output.ITokenGenerator
+    public class JwtTokenGenerator : ITokenGenerator
     {
         private readonly IConfiguration _configuration;
 

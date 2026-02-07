@@ -1,5 +1,5 @@
 ﻿using Application.DTOs;
-using Application.Ports.Input;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FullDevAPI.Controllers.Login

@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Folder Include="Adapters\" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

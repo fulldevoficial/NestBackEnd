@@ -1,4 +1,4 @@
-namespace Application.Ports.Output
+namespace Application.Interfaces
 {
     public interface IPasswordHasher
     {

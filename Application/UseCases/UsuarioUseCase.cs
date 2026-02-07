@@ -1,6 +1,5 @@
 using Application.DTOs;
-using Application.Ports.Input;
-using Application.Ports.Output;
+using Application.Interfaces;
 using Domain.Common;
 using Domain.Entities;
 using Domain.Repositories;
