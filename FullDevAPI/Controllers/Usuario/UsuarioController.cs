@@ -24,10 +24,19 @@ namespace FullDevAPI.Controllers
             return Ok(usuarios);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetUsuario(int id)
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetUsuario(Guid id)
         {
             var usuario = await _usuarioUseCase.BuscarPorIdAsync(id);
+            return usuario is null
+                ? NotFound(new { sucesso = false, mensagem = "Usuário não encontrado." })
+                : Ok(usuario);
+        }
+
+        [HttpGet("codigo/{codigo:int}")]
+        public async Task<IActionResult> GetUsuarioPorCodigo(int codigo)
+        {
+            var usuario = await _usuarioUseCase.BuscarPorCodigoAsync(codigo);
             return usuario is null
                 ? NotFound(new { sucesso = false, mensagem = "Usuário não encontrado." })
                 : Ok(usuario);
@@ -36,16 +45,16 @@ namespace FullDevAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUsuario([FromBody] CriarUsuarioDto dto)
         {
-            var (sucesso, mensagem) = await _usuarioUseCase.CriarAsync(dto);
+            var (sucesso, mensagem, id) = await _usuarioUseCase.CriarAsync(dto);
 
             if (sucesso)
-                return CreatedAtAction(nameof(GetUsuario), new { id = 0 }, new { sucesso, mensagem });
+                return CreatedAtAction(nameof(GetUsuario), new { id }, new { sucesso, mensagem, id });
 
             return StatusCode(500, new { sucesso, mensagem });
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateUsuario(int id, [FromBody] AtualizarUsuarioDto dto)
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> UpdateUsuario(Guid id, [FromBody] AtualizarUsuarioDto dto)
         {
             var (sucesso, mensagem) = await _usuarioUseCase.AtualizarAsync(id, dto);
 
@@ -55,8 +64,8 @@ namespace FullDevAPI.Controllers
             return StatusCode(500, new { sucesso, mensagem });
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteUsuario(int id)
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteUsuario(Guid id)
         {
             var (sucesso, mensagem) = await _usuarioUseCase.RemoverAsync(id);
 

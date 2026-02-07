@@ -22,7 +22,7 @@ namespace Services.Implementation.Login
         {
             var usuario = await _usuarioService.BuscarPorEmail(login.Email);
 
-            if (usuario == null || !BCrypt.Net.BCrypt.Verify(login.Password, usuario.PASSWORD))
+            if (usuario == null || !BCrypt.Net.BCrypt.Verify(login.Password, usuario.Password))
             {
                 return new List<object>
                 {

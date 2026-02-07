@@ -3,6 +3,10 @@ using Application.Ports.Output;
 using Application.UseCases;
 using Application.Implementations;
 using Data;
+using Data.Repositories;
+using Domain.Common;
+using Domain.Repositories;
+using Domain.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -39,8 +43,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configuração do PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Registra o gerador de UUIDv7
+builder.Services.AddSingleton<IIdentityGenerator, UuidV7Generator>();
+
+// Registra repositories
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 
 builder.Services.AddServices();
 builder.Services.AddScoped<ITokenGenerator, JwtTokenGenerator>();

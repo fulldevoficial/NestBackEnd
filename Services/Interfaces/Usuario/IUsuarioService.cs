@@ -1,19 +1,15 @@
 ﻿using Models.Usuario;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.Interfaces.Usuario
 {
     public interface IUsuarioService
     {
         Task<IEnumerable<UsuarioModel>> Listar();
-        Task<UsuarioModel?> BuscarPorId(int id);
+        Task<UsuarioModel?> BuscarPorId(Guid id);
+        Task<UsuarioModel?> BuscarPorCodigo(int codigo);
         Task<(bool sucesso, string mensagem)> Criar(UsuarioModel usuario);
-        Task<(bool sucesso, string mensagem)> Atualizar(int id, UsuarioModel usuario);
-        Task<(bool sucesso, string mensagem)> Remover(int id);
+        Task<(bool sucesso, string mensagem)> Atualizar(Guid id, UsuarioModel usuario);
+        Task<(bool sucesso, string mensagem)> Remover(Guid id);
         Task<UsuarioModel?> BuscarPorEmail(string email);
     }
 }

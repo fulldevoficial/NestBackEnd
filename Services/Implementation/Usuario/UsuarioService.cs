@@ -1,4 +1,5 @@
 ﻿using Data;
+using Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Models.Usuario;
 using Services.Interfaces.Usuario;
@@ -8,10 +9,12 @@ namespace Services.Implementation.Usuario
     public class UsuarioService : IUsuarioService
     {
         private readonly AppDbContext _context;
+        private readonly IIdentityGenerator _identityGenerator;
 
-        public UsuarioService(AppDbContext context)
+        public UsuarioService(AppDbContext context, IIdentityGenerator identityGenerator)
         {
             _context = context;
+            _identityGenerator = identityGenerator;
         }
 
         public async Task<IEnumerable<UsuarioModel>> Listar()
@@ -19,16 +22,25 @@ namespace Services.Implementation.Usuario
             return await _context.Usuario.ToListAsync();
         }
 
-        public async Task<UsuarioModel?> BuscarPorId(int id)
+        public async Task<UsuarioModel?> BuscarPorId(Guid id)
         {
             return await _context.Usuario.FindAsync(id);
+        }
+
+        public async Task<UsuarioModel?> BuscarPorCodigo(int codigo)
+        {
+            return await _context.Usuario.FirstOrDefaultAsync(u => u.CodigoUsuario == codigo);
         }
 
         public async Task<(bool sucesso, string mensagem)> Criar(UsuarioModel usuario)
         {
             try
             {
-                usuario.PASSWORD = BCrypt.Net.BCrypt.HashPassword(usuario.PASSWORD);
+                // Gera um novo UUIDv7 para o usuário
+                usuario.Id = _identityGenerator.Generate();
+
+                // Hash da senha
+                usuario.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password);
 
                 _context.Usuario.Add(usuario);
                 await _context.SaveChangesAsync();
@@ -41,15 +53,20 @@ namespace Services.Implementation.Usuario
             }
         }
 
-        public async Task<(bool sucesso, string mensagem)> Atualizar(int id, UsuarioModel usuario)
+        public async Task<(bool sucesso, string mensagem)> Atualizar(Guid id, UsuarioModel usuario)
         {
             var usuarioExistente = await _context.Usuario.FindAsync(id);
             if (usuarioExistente == null)
                 return (false, "Usuário não encontrado.");
 
-            usuarioExistente.NOME = usuario.NOME;
-            usuarioExistente.EMAIL = usuario.EMAIL;
-            usuarioExistente.PASSWORD = usuario.PASSWORD;
+            usuarioExistente.Nome = usuario.Nome;
+            usuarioExistente.Email = usuario.Email;
+
+            // Só atualiza a senha se foi informada
+            if (!string.IsNullOrWhiteSpace(usuario.Password))
+            {
+                usuarioExistente.Password = BCrypt.Net.BCrypt.HashPassword(usuario.Password);
+            }
 
             try
             {
@@ -63,7 +80,7 @@ namespace Services.Implementation.Usuario
             }
         }
 
-        public async Task<(bool sucesso, string mensagem)> Remover(int id)
+        public async Task<(bool sucesso, string mensagem)> Remover(Guid id)
         {
             var usuario = await _context.Usuario.FindAsync(id);
             if (usuario == null)
@@ -83,7 +100,7 @@ namespace Services.Implementation.Usuario
 
         public async Task<UsuarioModel?> BuscarPorEmail(string email)
         {
-            return await _context.Usuario.FirstOrDefaultAsync(u => u.EMAIL == email);
+            return await _context.Usuario.FirstOrDefaultAsync(u => u.Email == email);
         }
 
     }

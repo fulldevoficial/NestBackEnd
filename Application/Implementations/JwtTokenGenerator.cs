@@ -16,7 +16,7 @@ namespace Application.Implementations
             _configuration = configuration;
         }
 
-        public string GenerateToken(string email, int userId)
+        public string GenerateToken(string email, Guid userId)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

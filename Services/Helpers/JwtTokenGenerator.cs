@@ -20,8 +20,9 @@ namespace Services.Helpers
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, usuario.EMAIL),
-                new Claim("usuarioId", usuario.CD_USUARIO.ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub, usuario.Email),
+                new Claim("usuarioId", usuario.Id.ToString()),
+                new Claim("codigoUsuario", usuario.CodigoUsuario.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 

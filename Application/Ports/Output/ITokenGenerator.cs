@@ -2,6 +2,6 @@ namespace Application.Ports.Output
 {
     public interface ITokenGenerator
     {
-        string GenerateToken(string email, int userId);
+        string GenerateToken(string email, Guid userId);
     }
 }
