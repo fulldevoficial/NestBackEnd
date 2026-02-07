@@ -1,13 +1,15 @@
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Models.Usuario;
 
 namespace Data.Configurations
 {
-    public class UsuarioDbMapping : IEntityTypeConfiguration<UsuarioModel>
+    public class UsuarioDbMapping : IEntityTypeConfiguration<Usuario>
     {
-        public void Configure(EntityTypeBuilder<UsuarioModel> builder)
+        public void Configure(EntityTypeBuilder<Usuario> builder)
         {
+            builder.ToTable("Usuario");
+
             builder.HasKey(u => u.Id);
             builder.Property(u => u.Id)
                 .ValueGeneratedNever();
@@ -15,6 +17,8 @@ namespace Data.Configurations
             builder.HasIndex(u => u.CodigoUsuario)
                 .IsUnique()
                 .HasDatabaseName("uk_usuarios_codigo");
+
+            builder.Property(u => u.CodigoUsuario);
 
             builder.Property(u => u.Nome)
                 .HasMaxLength(200);
@@ -25,6 +29,9 @@ namespace Data.Configurations
 
             builder.Property(u => u.Email)
                 .HasMaxLength(255);
+
+            builder.Property(u => u.PasswordHash)
+                .HasColumnName("Password");
         }
     }
 }
