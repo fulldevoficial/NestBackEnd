@@ -1,6 +1,4 @@
-﻿using Data.Configurations;
-using Microsoft.EntityFrameworkCore;
-using Models.Usuario;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace Data
 {
@@ -10,14 +8,21 @@ namespace Data
         {
         }
 
-        public DbSet<UsuarioModel> Usuario { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Aplica as configurações usando Fluent API
-            modelBuilder.ApplyConfiguration(new UsuarioConfiguration());
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                entity.SetTableName(entity.GetTableName()?.ToLower());
+
+                foreach (var property in entity.GetProperties())
+                {
+                    property.SetColumnName(property.GetColumnName().ToLower());
+                }
+            }
+
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
     }
 }
