@@ -63,8 +63,9 @@ var app = builder.Build();
 // Aplicar migrations automaticamente
 using (var scope = app.Services.CreateScope())
 {
+    var versionMigration = 1;
     var migrationService = scope.ServiceProvider.GetRequiredService<MigrationService>();
-    await migrationService.AplicarMigration(1);
+    await migrationService.AplicarMigration(versionMigration);
 }
 
 if (app.Environment.IsDevelopment())
