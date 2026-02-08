@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Application.DTOs;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Models.Login;
-using Services.Interfaces.Login;
 
 namespace FullDevAPI.Controllers.Login
 {
@@ -9,17 +8,22 @@ namespace FullDevAPI.Controllers.Login
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthService _auth;
+        private readonly IAuthUseCase _authUseCase;
 
-        public AuthController(IAuthService auth)
+        public AuthController(IAuthUseCase authUseCase)
         {
-            _auth = auth;
+            _authUseCase = authUseCase;
         }
 
         [HttpPost("login")]
-        public async Task<IEnumerable<object>> Login([FromBody] LoginRequest login)
+        public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            return await _auth.Autenticar(login);
+            var (sucesso, mensagem, token) = await _authUseCase.LoginAsync(dto);
+
+            if (sucesso)
+                return Ok(new { sucesso, mensagem, token });
+
+            return Unauthorized(new { sucesso, mensagem });
         }
     }
 }

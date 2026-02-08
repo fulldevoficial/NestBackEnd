@@ -1,10 +1,7 @@
-﻿using Data;
+﻿using Application.DTOs;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models.Usuario;
-using Services.Interfaces.Usuario;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FullDevAPI.Controllers
 {
@@ -13,47 +10,53 @@ namespace FullDevAPI.Controllers
     [Route("api/[controller]")]
     public class UsuarioController : ControllerBase
     {
-        private readonly IUsuarioService _usuario;
+        private readonly IUsuarioUseCase _usuarioUseCase;
 
-        public UsuarioController(IUsuarioService usuario)
+        public UsuarioController(IUsuarioUseCase usuarioUseCase)
         {
-            _usuario = usuario;
+            _usuarioUseCase = usuarioUseCase;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetUsuarios()
         {
-            var usuarios = await _usuario.Listar();
+            var usuarios = await _usuarioUseCase.ListarTodosAsync();
             return Ok(usuarios);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetUsuario(int id)
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetUsuario(Guid id)
         {
-            var usuario = await _usuario.BuscarPorId(id);
+            var usuario = await _usuarioUseCase.BuscarPorIdAsync(id);
+            return usuario is null
+                ? NotFound(new { sucesso = false, mensagem = "Usuário não encontrado." })
+                : Ok(usuario);
+        }
+
+        [HttpGet("codigo/{codigo:int}")]
+        public async Task<IActionResult> GetUsuarioPorCodigo(int codigo)
+        {
+            var usuario = await _usuarioUseCase.BuscarPorCodigoAsync(codigo);
             return usuario is null
                 ? NotFound(new { sucesso = false, mensagem = "Usuário não encontrado." })
                 : Ok(usuario);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateUsuario([FromBody] UsuarioModel usuario)
+        public async Task<IActionResult> CreateUsuario([FromBody] CriarUsuarioDto dto)
         {
-            var (sucesso, mensagem) = await _usuario.Criar(usuario);
+            var (sucesso, mensagem, id) = await _usuarioUseCase.CriarAsync(dto);
 
             if (sucesso)
-                return CreatedAtAction(nameof(GetUsuario), new { id = usuario.CD_USUARIO }, new { sucesso, mensagem });
+                return CreatedAtAction(nameof(GetUsuario), new { id }, new { sucesso, mensagem, id });
 
             return StatusCode(500, new { sucesso, mensagem });
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdateUsuario(int id, [FromBody] UsuarioModel usuario)
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> UpdateUsuario(Guid id, [FromBody] AtualizarUsuarioDto dto)
         {
-            if (id != usuario.CD_USUARIO)
-                return BadRequest(new { sucesso = false, mensagem = "ID no corpo não corresponde ao parâmetro da rota." });
-
-            var (sucesso, mensagem) = await _usuario.Atualizar(id, usuario);
+            var (sucesso, mensagem) = await _usuarioUseCase.AtualizarAsync(id, dto);
 
             if (sucesso) return Ok(new { sucesso, mensagem });
             if (mensagem == "Usuário não encontrado.") return NotFound(new { sucesso, mensagem });
@@ -61,16 +64,15 @@ namespace FullDevAPI.Controllers
             return StatusCode(500, new { sucesso, mensagem });
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteUsuario(int id)
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeleteUsuario(Guid id)
         {
-            var (sucesso, mensagem) = await _usuario.Remover(id);
+            var (sucesso, mensagem) = await _usuarioUseCase.RemoverAsync(id);
 
             if (sucesso) return Ok(new { sucesso, mensagem });
             if (mensagem == "Usuário não encontrado.") return NotFound(new { sucesso, mensagem });
 
             return StatusCode(500, new { sucesso, mensagem });
         }
-
     }
 }
