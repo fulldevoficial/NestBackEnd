@@ -8,8 +8,6 @@ namespace Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Usuario> builder)
         {
-            builder.ToTable("Usuario");
-
             builder.HasKey(u => u.Id);
             builder.Property(u => u.Id)
                 .ValueGeneratedNever();

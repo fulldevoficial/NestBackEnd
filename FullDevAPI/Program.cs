@@ -3,6 +3,7 @@ using Application.UseCases;
 using Application.Implementations;
 using Data;
 using Data.Repositories;
+using Data.Services;
 using Domain.Common;
 using Domain.Repositories;
 using Domain.Services;
@@ -48,13 +49,23 @@ builder.Services.AddSingleton<IIdentityGenerator, UuidV7Generator>();
 
 // Registra repositories
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 
 builder.Services.AddScoped<ITokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
 builder.Services.AddScoped<IUsuarioUseCase, UsuarioUseCase>();
 builder.Services.AddScoped<IAuthUseCase, AuthUseCase>();
+builder.Services.AddScoped<ICourseUseCase, CourseUseCase>();
+builder.Services.AddScoped<MigrationService>();
 
 var app = builder.Build();
+
+// Aplicar migrations automaticamente
+using (var scope = app.Services.CreateScope())
+{
+    var migrationService = scope.ServiceProvider.GetRequiredService<MigrationService>();
+    await migrationService.AplicarMigration(1);
+}
 
 if (app.Environment.IsDevelopment())
 {
