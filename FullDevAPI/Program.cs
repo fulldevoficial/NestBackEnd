@@ -1,4 +1,4 @@
-using Application.Interfaces;
+ï»¿using Application.Interfaces;
 using Application.UseCases;
 using Application.Implementations;
 using Data;
@@ -18,7 +18,7 @@ var chaveJwt = builder.Configuration["Jwt:Key"];
 var emissor = builder.Configuration["Jwt:Issuer"];
 
 if (string.IsNullOrWhiteSpace(chaveJwt) || string.IsNullOrWhiteSpace(emissor))
-    throw new Exception("JWT Key ou Issuer não estão configurados corretamente.");
+    throw new Exception("JWT Key ou Issuer nao estao configurados corretamente.");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -40,7 +40,24 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configuração do PostgreSQL
+// CORS for local frontend
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+if (allowedOrigins.Length == 0)
+{
+    allowedOrigins = new[] { "http://localhost:4200", "https://localhost:4200" };
+}
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("LocalFrontend", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
+// Configuracao do PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -74,6 +91,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("LocalFrontend");
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -29,7 +29,7 @@ namespace FullDevAPI.Controllers
         {
             var usuario = await _usuarioUseCase.BuscarPorIdAsync(id);
             return usuario is null
-                ? NotFound(new { sucesso = false, mensagem = "Usuário não encontrado." })
+                ? NotFound(new { sucesso = false, mensagem = "Usuario nao encontrado." })
                 : Ok(usuario);
         }
 
@@ -38,10 +38,11 @@ namespace FullDevAPI.Controllers
         {
             var usuario = await _usuarioUseCase.BuscarPorCodigoAsync(codigo);
             return usuario is null
-                ? NotFound(new { sucesso = false, mensagem = "Usuário não encontrado." })
+                ? NotFound(new { sucesso = false, mensagem = "Usuario nao encontrado." })
                 : Ok(usuario);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateUsuario([FromBody] CriarUsuarioDto dto)
         {
@@ -59,7 +60,7 @@ namespace FullDevAPI.Controllers
             var (sucesso, mensagem) = await _usuarioUseCase.AtualizarAsync(id, dto);
 
             if (sucesso) return Ok(new { sucesso, mensagem });
-            if (mensagem == "Usuário não encontrado.") return NotFound(new { sucesso, mensagem });
+            if (mensagem == "Usuario nao encontrado.") return NotFound(new { sucesso, mensagem });
 
             return StatusCode(500, new { sucesso, mensagem });
         }
@@ -70,7 +71,7 @@ namespace FullDevAPI.Controllers
             var (sucesso, mensagem) = await _usuarioUseCase.RemoverAsync(id);
 
             if (sucesso) return Ok(new { sucesso, mensagem });
-            if (mensagem == "Usuário não encontrado.") return NotFound(new { sucesso, mensagem });
+            if (mensagem == "Usuario nao encontrado.") return NotFound(new { sucesso, mensagem });
 
             return StatusCode(500, new { sucesso, mensagem });
         }
